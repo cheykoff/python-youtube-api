@@ -28,22 +28,21 @@ print it
 
 '''
 Improvement Ideas:
-- clear name of the channels
+- abstract call to a function
+- use objects
 - parallelize api calls to save time
 - save retrieved data in a txt file to reduce the number of api calls (e.g. only call the api when the last update is older than 23 hours)
 - add borders to the table
-- adjust alignment
 - save results to a csv, excel, or google spreadsheet or publish it on a website
 - automate the script e.g. let it run once a day to update info on the website
 - automate to retrieve the most interesting channels (e.g. number of videos with python in the name)
 '''
 
-
 from googleapiclient.discovery import build
 import os
 
+# channels have either defined a username or id (idk why)
 l_channels = [
-
     ('Corey Schafer', 'schafer5'),
     ('Programming with Mosh', 'programmingwithmosh'),
     ('freeCodeCamp', 'UC8butISFwT-Wl7EV0hUK0BQ'),
@@ -56,18 +55,14 @@ l_channels = [
     ('ProgrammingKnowledge', 'ProgrammingKnowledge'),
     ('sentdex', 'sentdex')
 ]
-'''
-for ch in l_channels:
-    if ch[0:2] != 'UC':
-        print(ch[0:2])
-        print(ch)
-'''
+
 
 d_channels = dict()
 
 for ch in l_channels:
     youtube_api_key = os.environ.get('YOUTUBE_API_KEY')
     youtube = build('youtube', 'v3', developerKey=youtube_api_key)
+    # Check if the parameter is an id or username
     if ch[1][0:2] != 'UC':
         request = youtube.channels().list(
             part='statistics',
@@ -95,43 +90,17 @@ def print_dictionary(d_channels):
         videos, subscribers, views = value
         print("{:<25} {:<7} {:<12} {:<10}".format(
             key, videos, subscribers, views))
-        #(key, d_channels[key][0], d_channels[key][1], d_channels[key][2])
 
 
 def print_list(l_channels_sorted_by_subscribers):
-    print("{:<25} {:<7} {:<12} {:<10}".format(
-        'channel', 'videos', 'subscribers', 'views'))
+    print("{:<25} {:>7} {:>12} {:>10}".format(
+        'channel', ' videos', ' subscribers', ' views'))
     for item in l_channels_sorted_by_subscribers:
-        print("{:<25} {:<7} {:<12} {:<10}".format(
+        print("{:<25} {:>7} {:>12} {:>10}".format(
             item[0][0], item[1][0], item[1][1], item[1][2]))
 
-# print(d_channels)
-
-
-# print_dictionary(d_channels)
-# print("\n")
 
 l_channels_sorted_by_subscribers = sorted(
     d_channels.items(), key=lambda elem: elem[1][1], reverse=True)
 
 print_list(l_channels_sorted_by_subscribers)
-
-'''
-for item in l_channels_sorted_by_subscribers:
-    for item2 in item:
-        print(item2)
-'''
-
-# print(l_channels_sorted_by_subscribers)
-
-'''
-print(response['items'][0]['statistics']['viewCount'])
-print(response['items'][0]['statistics']['subscriberCount'])
-print(response['items'][0]['statistics']['videoCount'])
-
-a = response['items'][0]['statistics']['viewCount']
-print(type(a))
-
-b = int(a)
-print(type(b))
-'''
